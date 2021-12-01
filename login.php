@@ -1,14 +1,27 @@
 <?php
 header('Access-Control-Allow-Origin: *');
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
-$_POST = json_decode(file_get_contents("php://input"),true);
-
-echo json_encode($_POST);
+include_once 'Lib.php';
 
 if (isset($_POST) && !empty($_POST['username']) && !empty($_POST['password'])) {
+    $lib = new Lib();
 
-    print_r($_POST);
-
+    if ($res = $lib->login($_POST)) {
+        echo (json_encode([
+            'status' => 'success',
+            'message' => $res
+        ]));
+    } else {
+        echo (json_encode([
+            'status' => 'failure',
+            'message' => 'Username or password can not match!'
+        ]));
+    }
+} else {
+    echo json_encode([
+        'status' => 'failure',
+        'message' => 'Please Enter Valid Username & Password!'
+    ]);
 }

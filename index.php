@@ -4,14 +4,21 @@
     header('Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE');
     header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
+    include_once 'route.php';
 
-    $_POST = json_decode(file_get_contents("php://input"),true);
-    $headers = getallheaders();
+    $method = $_SERVER['REQUEST_METHOD'];
 
-    if (isset($_GET) && !empty($_GET['path'])) {
-
-
-    } elseif (isset($_POST) && !empty($_POST)) {
-
-
+    switch ($method) {
+        case 'POST':
+            postRequest ();
+            break;
+        case 'GET':
+            getRequest ();
+            break;
+        case 'DELETE':
+            deleteRequest ();
+            break;
+        case 'PUT':
+            putRequest ();
+            break;
     }
