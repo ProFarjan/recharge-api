@@ -6,19 +6,28 @@
 
     include_once 'route.php';
 
-    $method = $_SERVER['REQUEST_METHOD'];
-
-    switch ($method) {
-        case 'POST':
-            postRequest ();
-            break;
-        case 'GET':
-            getRequest ();
-            break;
-        case 'DELETE':
-            deleteRequest ();
-            break;
-        case 'PUT':
-            putRequest ();
-            break;
+    $headers = getallheaders();
+    if (!array_key_exists('Authorization', $headers)) {
+        echo json_encode(['status' => 'failure', 'message' => 'Authorization not found!']);
+        return;
+    }
+    $getAuth = getToken(trim($headers['Authorization'], 'Bearer '));
+    if ($getAuth != true) {
+        echo $getAuth;
+    } else {
+        $method = $_SERVER['REQUEST_METHOD'];
+        switch ($method) {
+            case 'POST':
+                postRequest ();
+                break;
+            case 'GET':
+                getRequest ();
+                break;
+            case 'DELETE':
+                deleteRequest ();
+                break;
+            case 'PUT':
+                putRequest ();
+                break;
+        }
     }

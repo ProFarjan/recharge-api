@@ -8,10 +8,13 @@ include_once 'Database.php';
 
 class Lib extends Database {
 
+    private $token_user = 'admin';
+    private $token_pass = '12456';
+
     public function get($params) {
         if ($params = $this->validParams($params)) {
             try {
-                $stmt = $this->conn->prepare('SELECT ' . $params['cols'] . ' FROM ' . $params['table'] . ' WHERE ' . $params['params']);
+                $stmt = $this->conn->prepare('SELECT ' . $params['cols'] . ' FROM ' . $params['table'] . ' WHERE ' . (empty($params['params']) ? 1 : $params['params']));
                 $stmt->execute();
                 return $stmt->fetchAll(PDO::FETCH_ASSOC);
             } catch (PDOException $e) {
@@ -46,7 +49,7 @@ class Lib extends Database {
         $stmt->execute();
         $res = $stmt->fetch(PDO::FETCH_OBJ);
         if ($res) {
-            $res->accesToken = $this->createToken($res);
+            $res->accesToken = $this->getToken();
             unset($res->username);
             unset($res->password);
             unset($res->created_date);
@@ -183,8 +186,12 @@ class Lib extends Database {
         }
     }
 
-    private function createToken ($user) {
-        return base64_encode(md5($user->username . ":" . $user->password));
+    public function verifyToken ($token) {
+        return ($token != $this->getToken()) ? ['status' => 'failure', 'message' => 'Unauthorized request'] : true ;
+    }
+
+    private function getToken () {
+        return base64_encode(md5($this->token_user . ":" . $this->token_pass));
     }
 
 

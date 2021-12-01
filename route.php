@@ -3,6 +3,11 @@
 include_once 'Lib.php';
 $lib = new Lib();
 
+function getToken ($token) {
+    global $lib;
+    return $lib->verifyToken($token);
+}
+
 function postRequest () {
     global $lib;
     if (isset($_POST) && !empty($_POST)) {
