@@ -39,7 +39,7 @@ class Lib extends Database {
                 return $this->errorException(['type' => '503', 'message' => $e->getMessage()]);
             }
         } else {
-            return $this->errorException(['500']);
+            return $this->errorException(['type' => '500']);
         }
     }
 
@@ -99,11 +99,11 @@ class Lib extends Database {
     }
 
     private function getParams ($params) {
-        $reserve_value = ['table','cols','_sort','_order','_limit','params'];
+        $reserve_value = ['table','cols','sort','order','limit','params'];
         $res = '';
         foreach ($params as $k => $param) {
             $org_k = explode('_', $k);
-            if (!in_array($org_k[0],$reserve_value)) {
+            if (!empty($org_k[0]) && !in_array($org_k[0],$reserve_value)) {
                 if (count($org_k) > 1) {
                     switch ($org_k[1]) {
                         case 'like' :
@@ -113,10 +113,10 @@ class Lib extends Database {
                             $this->norCase($org_k,$param);
                             break;
                         case 'in' :
-                            $this->inCase($org_k,$param);
+                            $res .= $this->inCase($org_k[0],$param);
                             break;
                         default:
-                            return false;
+                            $res .= $k . ' = ' . "$param and ";
                     }
                 } else {
                     if (is_numeric($param)) {
@@ -127,12 +127,34 @@ class Lib extends Database {
                 }
             }
         }
-        return trim($res, 'and ');
+        if (empty($res)) {
+            $res .= ' 1 ';
+        }
+        $res = trim($res, 'and ');
+
+        if (array_key_exists('_sort', $params) && array_key_exists('_order', $params)) {
+            $res .= ' ORDER BY ' . $params['_order'] . ' ' . $params['_sort'];
+        }
+        if (array_key_exists('_limit', $params)) {
+            $res .= ' LIMIT ' . $params['_limit'];
+        }
+        return $res;
     }
 
     private function likeCase() {}
     private function norCase() {}
-    private function inCase() {}
+    private function inCase($col,$val) {
+        $res = $col . ' IN (';
+        $values = explode(',',$val);
+        foreach ($values as $v) {
+            if (is_numeric($v)) {
+                $res .= "$v,";
+            } else {
+                $res .= "'$v',";
+            }
+        }
+        return trim($res, ',') . ') ';
+    }
 
     private function putFormatter ($data) {
         $res = '';

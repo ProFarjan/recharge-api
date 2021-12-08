@@ -17,7 +17,11 @@
     } else {
         $method = $_SERVER['REQUEST_METHOD'];
         switch ($method) {
+            case 'OPTIONS':
+                echo json_encode(['status'=>'success','message'=>'done']);
+                break;
             case 'POST':
+                $_POST = json_decode(file_get_contents('php://input'),true); //changes
                 postRequest ();
                 break;
             case 'GET':

@@ -5,6 +5,8 @@ header("Access-Control-Allow-Headers: Content-Type");
 
 include_once 'Lib.php';
 
+$_POST = json_decode(file_get_contents('php://input'),true); //changes
+
 if (isset($_POST) && !empty($_POST['username']) && !empty($_POST['password'])) {
     $lib = new Lib();
 

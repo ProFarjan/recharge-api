@@ -4,7 +4,7 @@ class Database {
 
     private $SERVER = 'localhost';
     private $USER = 'root';
-    private $PASS = '$Farjan9215$';
+    private $PASS = '$Wub2021$';
     private $DB = 'api_recharge';
     protected $conn = null;
 

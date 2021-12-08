@@ -93,7 +93,7 @@ function putRequest() {
 function extracted(Lib $lib)
 {
     if ($res = $lib->save($_POST, $_GET)) {
-        if (!array_key_exists('status', $res) && $res['status'] == 'success') {
+        if ($res['status'] == 'success') {
             echo(json_encode([
                 'status' => 'success',
                 'message' => $res
